@@ -1,0 +1,3 @@
+include requirements.txt
+recursive-include novel_dl_server/static *
+recursive-include novel_dl_server/templates *
