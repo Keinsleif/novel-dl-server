@@ -1,0 +1,51 @@
+{% extends 'layout.html' %}
+{% block content %}
+<form action="/" method="POST" enctype="multipart/form-data">
+<div class="form-group">
+<label for="url">URL</label>
+<input type="url" id="url" name="url" class="form-control" />
+</div>
+<div class="form-group">
+<label for="theme">Theme</label>
+<select id="theme" name="theme" class="form-control">
+{%- for theme in themes %}
+<option value="{{theme}}">{{theme}}</option>
+{%- endfor %}
+</select>
+</div>
+
+<div class="form-group">
+<label for="media">Media(Option)</label>
+<input class="form-control" type="text" id="media" name="media" />
+</div>
+<div class="form-check">
+<label class="form-check-label" for="renew">Renew(Option)</label>
+<input class="form-check-input" type="checkbox" id="renew" name="renew" value="True" />
+</div>
+<div class="form-check">
+<label class="form-check-label" for="axel">Axel(Option)</label>
+<input class="form-check-input" type="checkbox" id="axel" name="axel" value="True" />
+</div>
+<div class="form-group">
+<label for="episode">Episode(Option)</label>
+<input class="form-control" type="number" id="episode" name="episode" min="1" value="" style="width: 4em" />
+</div>
+<div class="form-check">
+<label class="form-check-label" for="short">Short(Option)</label>
+<input class="form-check-input" type="checkbox" id="short" name="short" value="True" />
+</div>
+<button type="button" class="btn btn-primary" id="submit">生成</button>
+<div class="spinner-border spinner-border-sm text-primary" id="spinner" role="status" style="display:none"></div>
+</form>
+
+<h2>Novel files</h2>
+<table class="table table-sm table-striped table-bodered">
+<thread class="thread-light">
+<tr><th>File Name</th><th>Download</th><th>Remove</th></tr>
+</thread>
+<tbody>
+{%- for file in files %}
+<tr><td>{{file}}</td><td><a href="/static/files/{{file}}">DL</a></td><td><a href="/cache/rm/{{file}}">RM</a></td></tr>
+{%- endfor %}
+</table>
+{% endblock %}
