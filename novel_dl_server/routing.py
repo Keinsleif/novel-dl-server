@@ -4,19 +4,22 @@
 from flask import request, render_template, url_for, make_response, flash, send_file, redirect
 import tempfile
 from http import HTTPStatus
-import os,shutil,zipfile,time
+import os,shutil,zipfile,time,json
 import novel_dl
+import urllib.parse
 from concurrent.futures import ThreadPoolExecutor
 
 tmp_dir=tempfile.TemporaryDirectory()
 root=os.path.dirname(os.path.abspath(__file__))+"/"
 
-#proc={num: {"th": None, "filename": None}}
 executor=ThreadPoolExecutor(max_workers=2, thread_name_prefix="th")
 proc={}
 
 def make_novel_pkg(args):
-	result=novel_dl.main(args)
+	try:
+		result=novel_dl.main(args)
+	except novel_dl.NovelDLException as e:
+		return [False,e.return_message()]
 	ncode=result[2]
 	nc=[ncode,args["theme"],args["media"]]
 	[nc.remove("") for i in range(0,nc.count(""))]
@@ -25,13 +28,13 @@ def make_novel_pkg(args):
 	else:
 		filename=root+"static/files/"+"-".join(nc)+"-multi.zip"
 	if os.path.isfile(filename):
-		return os.path.basename(filename)
+		return [True,os.path.basename(filename)]
 	if result[0]==1:
 		with zipfile.ZipFile(filename,"w",compression=zipfile.ZIP_DEFLATED) as new_zip:
 			new_zip.write(result[1],arcname=os.path.basename(result[1]))
 	else:
 		shutil.make_archive(os.path.splitext(filename)[0],'zip',root_dir=result[1])
-	return os.path.basename(filename)
+	return [True,os.path.basename(filename)]
 
 def prepare_response(response):
 	di=dir(response)
@@ -79,8 +82,7 @@ def do_add_download():
 def do_download_proc(pid):
 	if proc.get(pid):
 		if proc[pid].done():
-			filename=proc[pid].result()
-			return filename
+			return json.dumps(proc[pid].result())
 	time.sleep(5)
 	return "False"
 
