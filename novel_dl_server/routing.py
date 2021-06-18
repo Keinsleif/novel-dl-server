@@ -19,7 +19,8 @@ def make_novel_pkg(args):
 	try:
 		result=novel_dl.main(args)
 	except novel_dl.NovelDLException as e:
-		return [False,e.return_message()]
+		print(e.return_message())
+		return {"success":False,"result":e.return_message()}
 	ncode=result[2]
 	nc=[ncode,args["theme"],args["media"]]
 	[nc.remove("") for i in range(0,nc.count(""))]
@@ -28,13 +29,13 @@ def make_novel_pkg(args):
 	else:
 		filename=root+"static/files/"+"-".join(nc)+"-multi.zip"
 	if os.path.isfile(filename):
-		return [True,os.path.basename(filename)]
+		return {"success":True,"result":os.path.basename(filename)}
 	if result[0]==1:
 		with zipfile.ZipFile(filename,"w",compression=zipfile.ZIP_DEFLATED) as new_zip:
 			new_zip.write(result[1],arcname=os.path.basename(result[1]))
 	else:
 		shutil.make_archive(os.path.splitext(filename)[0],'zip',root_dir=result[1])
-	return [True,os.path.basename(filename)]
+	return {"success":True,"result":os.path.basename(filename)}
 
 def prepare_response(response):
 	di=dir(response)
@@ -50,7 +51,11 @@ def prepare_response(response):
 
 def show_home():
 	files=os.listdir(root+"static/files/")
-	return render_template("home.html",title="メインページ",themes=novel_dl.THEMES,files=files)
+	novelpks=[]
+	for file in files:
+		if os.path.splitext(file)[1]==".zip":
+			novelpks.append(file)
+	return render_template("home.html",title="メインページ",themes=novel_dl.THEMES,files=novelpks)
 
 def do_add_download():
 	args=novel_dl.args()
@@ -84,7 +89,7 @@ def do_download_proc(pid):
 		if proc[pid].done():
 			return json.dumps(proc[pid].result())
 	time.sleep(5)
-	return "False"
+	return "Never"
 
 def do_del_cache(file):
 	files=os.listdir(os.path.join(root,"static/files"))

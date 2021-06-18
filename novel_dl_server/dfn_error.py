@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 
 from flask import render_template
-import traceback
+import traceback,os
 from http import HTTPStatus
 
-MODE="DEBUG"
+MODE=os.environ.get("MODE")
 
 def exception_handler(ex):
 	if MODE=='DEBUG':

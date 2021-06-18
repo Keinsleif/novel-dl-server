@@ -1,4 +1,5 @@
 *.swp
+*.zip
 __pycache__
 *.egg-info
 .profile

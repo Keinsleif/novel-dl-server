@@ -3,7 +3,7 @@ window.onload = function() {
     document.getElementById('submit').onclick = function() {
         post();
     };
-  
+
     xhr = new XMLHttpRequest();
     xhr.onload = function (e) {
         if (xhr.readyState === 4) {
@@ -25,16 +25,16 @@ window.onload = function() {
     xhr2.onload = function (e) {
         if (xhr2.readyState === 4) {
             if (xhr2.status === 200) {
-                if (xhr2.responseText.match("/False/")){
+                if (xhr2.responseText.match("/Never/")){
                     dl_wait(pid);
                 }
                 else{
                     var response=JSON.parse(xhr2.responseText);
-                    if (response[0]){
+                    if (response["success"]){
                         location.reload();
                     }
                     else {
-                        add_alert(response[1]);
+                        add_alert(response["result"]);
                         document.getElementById("submit").disabled=false;
                         document.getElementById("spinner").style="display:none";
                     }
