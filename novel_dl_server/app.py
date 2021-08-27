@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from flask import Flask,request,make_response,redirect,url_for
-#from novel_dl_server import routing,dfn_error
 from novel_dl_server import routing,dfn_error
 import os
 
@@ -40,7 +39,11 @@ app.register_error_handler(404, dfn_error.not_found_handler)
 
 def main():
 	try:
-		app.run(debug=True,host='0.0.0.0',port=8080, threaded=True)
+		if os.environ.get("MODE")=="DEBUG":
+			debug=True
+		else:
+			debug=False
+		app.run(debug=debug,host='0.0.0.0',port=8080, threaded=True)
 	except KeyboardInterrupt:
 		routing.tmp_dir.cleanup()
 		routing.executor.shutdown()
